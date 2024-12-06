@@ -14,7 +14,7 @@ from datetime import datetime
 from tkinter import messagebox
 from ctypes import windll
 from win32com.shell import shell
-from .gui import CleanerGUI  # Changed to absolute import
+from src.gui import CleanerGUI
 
 def main():
     root = tk.Tk()
@@ -41,7 +41,7 @@ def run_as_admin():
         if not is_admin:
             print("Not running as admin, attempting to elevate privileges...")
             script = os.path.abspath(sys.argv[0])
-            params = f"-m src.main"  # Modified to use module syntax
+            params = f"{script}"  # Modified to use module syntax
             
             try:
                 shell.ShellExecuteEx(
