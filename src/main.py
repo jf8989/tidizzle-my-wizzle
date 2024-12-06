@@ -8,55 +8,79 @@ Date: [Current Date]
 
 import os
 import sys
+import traceback
 import tkinter as tk
 from datetime import datetime
 from tkinter import messagebox
 from ctypes import windll
 from win32com.shell import shell
-from .gui import CleanerGUI
+from .gui import CleanerGUI  # Changed to absolute import
+
+def main():
+    root = tk.Tk()
+    app = CleanerGUI(root)
+    root.mainloop()
+
+try:
+    import tkinter as tk
+    print("Tkinter successfully imported")
+except ImportError as e:
+    print(f"Error importing tkinter: {e}")
+
+def log_error(error):
+    with open('error_log.txt', 'a') as f:
+        f.write(f"\n{'-'*50}\n")
+        f.write(f"Error occurred at: {datetime.now()}\n")
+        f.write(traceback.format_exc())
 
 def run_as_admin():
     try:
+        print("Checking admin privileges...")
         is_admin = windll.shell32.IsUserAnAdmin()
+        
         if not is_admin:
-            # If not admin, try to elevate privileges
+            print("Not running as admin, attempting to elevate privileges...")
             script = os.path.abspath(sys.argv[0])
-            params = ' '.join([script] + sys.argv[1:])
+            params = f"-m src.main"  # Modified to use module syntax
+            
             try:
-                ret = shell.ShellExecuteEx(lpVerb='runas',
-                                         lpFile=sys.executable,
-                                         lpParameters=params)
-                sys.exit()
+                shell.ShellExecuteEx(
+                    lpVerb='runas',
+                    lpFile=sys.executable,
+                    lpParameters=params,
+                    nShow=1  # Added to show the window
+                )
+                print("Elevation request sent. Closing current instance.")
+                sys.exit(0)
+                
             except Exception as e:
-                # Log the error and show message box
                 error_msg = f"Failed to obtain admin rights: {str(e)}"
-                print(error_msg)  # This will be captured in a log file
-                messagebox.showerror("Admin Rights Required", 
-                                   "This application needs to run with administrative privileges.\n"
-                                   f"Error: {str(e)}")
+                print(error_msg)
+                messagebox.showerror(
+                    "Admin Rights Required",
+                    "This application needs administrative privileges.\n"
+                    f"Error: {str(e)}"
+                )
                 sys.exit(1)
-        else:
-            # Create log directory if it doesn't exist
-            log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
-            os.makedirs(log_dir, exist_ok=True)
-            
-            # Redirect stdout and stderr to a log file
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_file = os.path.join(log_dir, f'tidizzle_{timestamp}.log')
-            sys.stdout = open(log_file, 'w')
-            sys.stderr = sys.stdout
-            
-            print(f"Application started at {datetime.now()}")
-            
-            root = tk.Tk()
-            app = CleanerGUI(root)
-            root.mainloop()
-            
+        
+        return is_admin
+        
     except Exception as e:
-        error_msg = f"Critical error: {str(e)}"
-        print(error_msg)  # This will be captured in the log file
-        messagebox.showerror("Error", error_msg)
-        sys.exit(1)
+        print(f"Error checking admin privileges: {str(e)}")
+        raise
 
 if __name__ == "__main__":
-    run_as_admin()
+    print("Main block started")
+    try:
+        run_as_admin()
+        
+        # Initialize the main window
+        root = tk.Tk()
+        app = CleanerGUI(root)
+        root.mainloop()
+        
+    except Exception as e:
+        log_error(e)
+        print(f"Error occurred: {e}")
+        print("Check error_log.txt for details")
+        input("Press Enter to exit...")

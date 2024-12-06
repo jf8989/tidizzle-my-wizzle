@@ -41,6 +41,16 @@ class CleanerGUI:
         self.setup_path_selection()
         
     def setup_path_selection(self):
+        # Add Select All checkbox
+        self.select_all_var = tk.BooleanVar()
+        select_all_chk = tk.Checkbutton(
+            self.top_frame, 
+            text="Select All",
+            variable=self.select_all_var,
+            command=self.toggle_all_paths
+        )
+        select_all_chk.pack(anchor="w")
+        
         tk.Label(self.top_frame, text="Select paths to clean:").pack(anchor="w")
         
         self.paths_to_clean = get_paths_to_clean()
@@ -53,8 +63,14 @@ class CleanerGUI:
             self.path_vars.append(var)
             
         tk.Button(self.top_frame, text="Clean Selected Paths", 
-                 command=self.execute_clean).pack(pady=10)
-        
+                command=self.execute_clean).pack(pady=10)
+    
+    def toggle_all_paths(self):
+        """Toggle all path checkboxes based on Select All state"""
+        state = self.select_all_var.get()
+        for var in self.path_vars:
+            var.set(state)
+    
     def execute_clean(self):
         selected_paths = [
             path for path, var in zip(self.paths_to_clean, self.path_vars)
