@@ -1,3 +1,11 @@
+"""
+File: src/gui.py
+Project: Tidizzle My Wizzle
+Description: Main GUI implementation using tkinter.
+Author: [Your Name]
+Date: [Current Date]
+"""
+
 import tkinter as tk
 from tkinter import messagebox
 from .logger import Logger

@@ -1,3 +1,11 @@
+"""
+File: src/cleaner.py
+Project: Tidizzle My Wizzle
+Description: Core cleaning functionality implementation.
+Author: [Your Name]
+Date: [Current Date]
+"""
+
 import os
 import shutil
 from win32com.shell import shell, shellcon

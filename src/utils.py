@@ -1,3 +1,11 @@
+"""
+File: src/utils.py
+Project: Tidizzle My Wizzle
+Description: Utility functions for path management and calculations.
+Author: [Your Name]
+Date: [Current Date]
+"""
+
 import os
 
 def get_user_home_path():
