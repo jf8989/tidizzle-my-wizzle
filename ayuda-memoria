@@ -1,0 +1,3 @@
+pyinstaller --onefile --noconsole src/main.py --name tidizzle_cleaner
+
+.\.venv\Scripts\Activate
